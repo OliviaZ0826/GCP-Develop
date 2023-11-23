@@ -3,6 +3,7 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, abort
+import requests
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -74,6 +75,16 @@ def add_report():
                  {'issue': issue, 'description': description})
     conn.commit()
     conn.close()
+
+    # Send email via API after inserting the report
+    api_url = "https://15fhhhmf86.execute-api.us-east-1.amazonaws.com/default/test_gcp"
+    response = requests.post(api_url, json={})
+
+    if response.status_code == 200:
+        print("Email sent successfully")
+    else:
+        print("Failed to send email")
+
     return redirect('/')
 
 @app.route('/edit/<int:report_id>')
