@@ -1,0 +1,97 @@
+<!-- templates/reports.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background: #fff;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        ul li a {
+            margin-right: 10px;
+        }
+
+        .form-inline {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-inline button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add a New Report</h2>
+    <form method="post" action="/add">
+        <input type="text" name="issue" placeholder="Issue" required>
+        <textarea name="description" placeholder="Description"></textarea>
+        <button type="submit">Add Report</button>
+    </form>
+
+    <h2>Existing Reports</h2>
+    <ul>
+        {% for report in reports %}
+            <li>
+                {{ report.issue }} - {{ report.description }}
+                <a href="/edit/{{ report.id }}">Edit</a>
+                <form method="post" action="/delete/{{ report.id }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
