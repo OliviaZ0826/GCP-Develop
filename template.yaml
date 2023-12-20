@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda function to send email using SES
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler  # Assuming your handler is named 'lambda_handler' in 'index.py'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.9  # or your specific Python runtime version
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          from datetime import datetime
+
+          client = boto3.client('ses', region_name='us-east-2')
+
+          def lambda_handler(event, context):
+            if os.environ.get('IS_ENABLED') != 'true':
+              print("SES is disabled. Exiting without sending email.")
+              return
+
+            response = client.send_email(
+              Destination={
+                'ToAddresses': ['lz2933@columbia.edu']
+              },
+              Message={
+                'Body': {
+                  'Text': {
+                    'Charset': 'UTF-8',
+                    'Data': 'There is a new user report issue.',
+                  }
+                },
+                'Subject': {
+                  'Charset': 'UTF-8',
+                  'Data': 'New Issue',
+                },
+              },
+              Source='oliviaz0826@outlook.com'
+            )
+            
+            print(response)
+            
+            return {
+              'statusCode': 200,
+              'body': json.dumps("Email Sent Successfully. MessageId is: " + response['MessageId'])
+            }
+      Environment:
+        Variables:
+          IS_ENABLED: 'true'
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaSESAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
